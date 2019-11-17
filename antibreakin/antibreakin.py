@@ -5,7 +5,7 @@ import datetime as dt
 from time import sleep
 from datetime import datetime
 
-cascPath = "./antibreakin/haarcascade_frontalface_default.xml"
+cascPath = "./cascades/haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 log.basicConfig(filename='antibreakin.log',level=log.INFO)
 
