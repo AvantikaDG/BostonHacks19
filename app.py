@@ -180,9 +180,9 @@ def anti_break_in():
                 print("Bose API called")
             if time_in_frame_ms == twilio_delay_ms:
                 # Your Account SID from twilio.com/console
-                account_sid = "AC0d63a56e9fd20c654f3c6c3b050a84b1"
+                account_sid = ""
                 # Your Auth Token from twilio.com/console
-                auth_token  = "653bec204875d1159186cba9d8e6c1d6"
+                auth_token  = ""
                 
                 client = Client(account_sid, auth_token)
                 
