@@ -1,5 +1,5 @@
 from statistics import mode
-
+import requests
 import cv2
 from keras.models import load_model
 import numpy as np
@@ -96,6 +96,35 @@ while len(emotions) < max_emotions_len:
     cv2.imshow('window_frame', bgr_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-print(f"Spotify API for emotion {mode(emotions)}")
+final_emotion = mode(emotions)
+print(f"Spotify API for emotion {final_emotion}")
 video_capture.release()
 cv2.destroyAllWindows()
+
+
+headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer BQCaR_vaYaQ687FxN-j5EfvKujeH-WYR9LEsotQsSliH-X8Tm3xgRnLRA9yTqxwhHRVzSx-IwS1mQAeMs6_qqJc_ORuMb9XExtAZs6bjEuJ7lfnYV1s8AfMPwynTSsIfgRFB35q6DlbyPB6voZUeVcX-54A_hDtGEaA11RFex9yDDMBPuFHddctY6kb0Tac-O2wW0V4tigAeqbn1IvveXhh-g1eSq1Klqx43kS9aWKvA62-TzKVNC8rsAruWBn4K9FeeeM0sjTBePcbd1AHZwGFaivVy1NK5aw'
+}
+
+
+data = '{"device_ids":["10640d809a60bd540378d37abc213d91f52357bc"]}'
+response = requests.put('https://api.spotify.com/v1/me/player', headers=headers, data=data)
+print(response.content)
+params = (
+    ('device_id', '10640d809a60bd540378d37abc213d91f52357bc'),
+)
+
+if final_emotion == 'happy':
+    data = '{"context_uri":"spotify:playlist:1llkez7kiZtBeOw5UjFlJq","offset":{"position":1},"position_ms":0}'
+elif final_emotion == 'sad':
+    data = '{"context_uri":"spotify:playlist:3m0JCCYnh27D4J13rWBfgs","offset":{"position":1},"position_ms":0}'
+elif final_emotion == 'surprise':
+    data = '{"context_uri":"spotify:playlist:3ylCiverZxobHBTbMy1dO5","offset":{"position":1},"position_ms":0}'
+elif final_emotion == 'angry':
+    data = '{"context_uri":"spotify:playlist:0KPEhXA3O9jHFtpd1Ix5OB","offset":{"position":1},"position_ms":0}'
+else:
+    data = '{"context_uri":"spotify:playlist:0s609Gm5FgpZu6VfJA4I1H","offset":{"position":1},"position_ms":0}'
+
+response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers, params=params, data=data)

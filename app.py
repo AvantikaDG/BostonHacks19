@@ -20,13 +20,6 @@ import os
 from statistics import mode
 from keras.models import load_model
 import numpy as np
-from mooddetection.src.utils.datasets import get_labels
-from mooddetection.src.utils.inference import detect_faces
-from mooddetection.src.utils.inference import draw_text
-from mooddetection.src.utils.inference import draw_bounding_box
-from mooddetection.src.utils.inference import apply_offsets
-from mooddetection.src.utils.inference import load_detection_model
-from mooddetection.src.utils.preprocessor import preprocess_input
 import spotipy
 import spotipy.util as util
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -57,13 +50,13 @@ def pause():
 
 @app.route("/increase_volume", methods=['GET'])
 def increase_volume():
-   data = "<?xml version=\"1.0\" ?> <volume>30</volume>"
+   data = "<?xml version=\"1.0\" ?> <volume>50</volume>"
    response = requests.post('http://'+str(ip_address)+':8090/volume', data=data)
    return str(response)
 
 @app.route("/decrease_volume", methods=['GET'])
 def decrease_volume():
-   data = "<?xml version=\"1.0\" ?> <volume>10</volume>"
+   data = "<?xml version=\"1.0\" ?> <volume>25</volume>"
    response = requests.post('http://'+str(ip_address)+':8090/volume', data=data)
    return str(response)
 
@@ -96,8 +89,9 @@ def now_playing():
    response = requests.get('http://'+str(ip_address)+':8090/now_playing')
    return str(response.text)
 
-@app.route("/add_track", methods=['GET'])
+@app.route("/add_track", methods=['GET','POST'])
 def add_track():
+    
     CLIENT_ID = "bdf58bd0c8954b8c97dd7772d9a0fb48"
     CLIENT_SECRET = "88fcfa2951394544baf2060caeb626fb"
     credentials = oauth2.SpotifyClientCredentials(
@@ -108,13 +102,14 @@ def add_track():
     #track = "coldplay yellow"
     #res = spotify.search(track, type="track", market=market, limit=1)
     #print(res)
-    print("REQUEST:", request)
-#    song_name = request.args.get('song')
-#    artist_name = request.args.get('artist')
-    
+#    print("REQUEST:", request)
+#    song_name = str(request.args.get('song'))
+#    artist_name = str(request.args.get('artist'))
+#    print(song_name + " " + artist_name)
 #    request.args.get('param')
-    song_name = 'Numb'
-    artist_name = 'Linkin Park'
+    #print("REQ: ", request.args.get("a"))
+    song_name = 'Paradise'
+    artist_name = 'Coldplay'
     results = spotify.search(q='track:' + song_name  + ' artist:' +artist_name, type='track')
     #playlist='51GTWGAMzL5zt7oUPcxwne'
     items = results['tracks']['items']
@@ -123,14 +118,15 @@ def add_track():
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer BQCV5ifScmbadx5V0F7gjplNc3cG2dGRDZa9Gha_LUanAleNX7Y6BhdbDiGlhu97M0-BayINFdR0M0T9YK1G2HEEuN4CLieI5dKemjudlFK_7hGu0poLigfI0iYmE2XjFJkNMdym4UzJRB69wz5eg7jrhP_Pa8ZGCAYX8VPjH48TUu9i1gLVMfu4b7m70aF1eVrb1EgZ2FyYA74Dffwdv9fXtEh6wiCIOy5Hk22Jx0bJtKPWzXOx82TCBZu7Xi76wwthpEZ9F5UIwXi9ibkv6I6dJfGQCaBB1w',
+        'Authorization': 'Bearer BQCaR_vaYaQ687FxN-j5EfvKujeH-WYR9LEsotQsSliH-X8Tm3xgRnLRA9yTqxwhHRVzSx-IwS1mQAeMs6_qqJc_ORuMb9XExtAZs6bjEuJ7lfnYV1s8AfMPwynTSsIfgRFB35q6DlbyPB6voZUeVcX-54A_hDtGEaA11RFex9yDDMBPuFHddctY6kb0Tac-O2wW0V4tigAeqbn1IvveXhh-g1eSq1Klqx43kS9aWKvA62-TzKVNC8rsAruWBn4K9FeeeM0sjTBePcbd1AHZwGFaivVy1NK5aw',
     }
     params = (
         ('uris', 'spotify:track:'+str(song_id)),
     )
     response = requests.post('https://api.spotify.com/v1/playlists/6DJBPRMt1N72fSz7izSEuB/tracks', headers=headers, params=params)
-    
+
     return str(response.text)
+    
 
 @app.route("/anti_break_in", methods=['GET'])
 def anti_break_in():
@@ -179,7 +175,7 @@ def anti_break_in():
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
             time_in_frame_ms += frame_delay
             if time_in_frame_ms == api_call_delay_ms:
-                data = '<play_info><app_key>'+str(app_key)+'</app_key><url>'+str(mp3_url)+'</url><service>service text</service><reason>reason text</reason><message>message text</message><volume>25</volume></play_info>'
+                data = '<play_info><app_key>'+str(app_key)+'</app_key><url>'+str(mp3_url)+'</url><service>service text</service><reason>reason text</reason><message>message text</message><volume>50</volume></play_info>'
                 response = requests.post('http://'+str(ip_address)+':8090/speaker', data=data)                
                 print("Bose API called")
             if time_in_frame_ms == twilio_delay_ms:
@@ -286,7 +282,7 @@ def user_detection():
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'BQCV5ifScmbadx5V0F7gjplNc3cG2dGRDZa9Gha_LUanAleNX7Y6BhdbDiGlhu97M0-BayINFdR0M0T9YK1G2HEEuN4CLieI5dKemjudlFK_7hGu0poLigfI0iYmE2XjFJkNMdym4UzJRB69wz5eg7jrhP_Pa8ZGCAYX8VPjH48TUu9i1gLVMfu4b7m70aF1eVrb1EgZ2FyYA74Dffwdv9fXtEh6wiCIOy5Hk22Jx0bJtKPWzXOx82TCBZu7Xi76wwthpEZ9F5UIwXi9ibkv6I6dJfGQCaBB1w',
+        'Authorization': 'Bearer BQCaR_vaYaQ687FxN-j5EfvKujeH-WYR9LEsotQsSliH-X8Tm3xgRnLRA9yTqxwhHRVzSx-IwS1mQAeMs6_qqJc_ORuMb9XExtAZs6bjEuJ7lfnYV1s8AfMPwynTSsIfgRFB35q6DlbyPB6voZUeVcX-54A_hDtGEaA11RFex9yDDMBPuFHddctY6kb0Tac-O2wW0V4tigAeqbn1IvveXhh-g1eSq1Klqx43kS9aWKvA62-TzKVNC8rsAruWBn4K9FeeeM0sjTBePcbd1AHZwGFaivVy1NK5aw',
     }
     data = '{"device_ids":["10640d809a60bd540378d37abc213d91f52357bc"]}'
     response = requests.put('https://api.spotify.com/v1/me/player', headers=headers, data=data)
@@ -305,118 +301,6 @@ def user_detection():
 def mood_detection():
    exec(open('mooddetection/src/mooddetection.py').read())
    return str('ok')
-#    detection_model_path = './cascades/haarcascade_frontalface_default.xml'
-#    # emotion_model_path = '../trained_models/emotion_models/fer2013_mini_XCEPTION.102-0.66.hdf5'
-#    emotion_model_path = './mooddetection/trained_models/emotion_models/fer2013_mini_XCEPTION.102-0.66.hdf5'
-#    emotion_labels = get_labels('fer2013')
-#    
-#    # hyper-parameters for bounding boxes shape
-#    frame_window = 10
-#    emotion_offsets = (20, 40)
-#    
-#    # loading models
-#    face_detection = load_detection_model(detection_model_path)
-#    emotion_classifier = load_model(emotion_model_path, compile=False)
-#    
-#    # getting input model shapes for inference
-#    emotion_target_size = emotion_classifier.input_shape[1:3]
-#    
-#    # starting lists for calculating modes
-#    emotion_window = []
-#    
-#    # starting video streaming
-#    cv2.namedWindow('window_frame')
-#    video_capture = cv2.VideoCapture(0)
-#    fps = 20
-#    frame_delay = 1000 // fps
-#    emotion_duration_ms = 1250
-#    emotions = []
-#    max_emotions_len = emotion_duration_ms // frame_delay
-#    while len(emotions) < max_emotions_len:
-#        cv2.waitKey(frame_delay)
-#        bgr_image = video_capture.read()[1]
-#        gray_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)
-#        rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
-#        faces = detect_faces(face_detection, gray_image)
-#    
-#        for face_coordinates in faces:
-#    
-#            x1, x2, y1, y2 = apply_offsets(face_coordinates, emotion_offsets)
-#            gray_face = gray_image[y1:y2, x1:x2]
-#            try:
-#                gray_face = cv2.resize(gray_face, (emotion_target_size))
-#            except:
-#                continue
-#    
-#            gray_face = preprocess_input(gray_face, True)
-#            gray_face = np.expand_dims(gray_face, 0)
-#            gray_face = np.expand_dims(gray_face, -1)
-#            emotion_prediction = emotion_classifier.predict(gray_face)
-#            emotion_probability = np.max(emotion_prediction)
-#            emotion_label_arg = np.argmax(emotion_prediction)
-#            emotion_text = emotion_labels[emotion_label_arg]
-#            emotion_window.append(emotion_text)
-#            emotions.append(emotion_text)
-#    
-#            if len(emotion_window) > frame_window:
-#                emotion_window.pop(0)
-#            try:
-#                emotion_mode = mode(emotion_window)
-#            except:
-#                continue
-#    
-#            if emotion_text == 'angry':
-#                color = emotion_probability * np.asarray((255, 0, 0))
-#            elif emotion_text == 'sad':
-#                color = emotion_probability * np.asarray((0, 0, 255))
-#            elif emotion_text == 'happy':
-#                color = emotion_probability * np.asarray((255, 255, 0))
-#            elif emotion_text == 'surprise':
-#                color = emotion_probability * np.asarray((0, 255, 255))
-#            else:
-#                color = emotion_probability * np.asarray((0, 255, 0))
-#    
-#            color = color.astype(int)
-#            color = color.tolist()
-#    
-#            draw_bounding_box(face_coordinates, rgb_image, color)
-#            draw_text(face_coordinates, rgb_image, emotion_mode,
-#                      color, 0, -45, 1, 1)
-#    
-#        bgr_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2BGR)
-#        cv2.imshow('window_frame', bgr_image)
-#        if cv2.waitKey(1) & 0xFF == ord('q'):
-#            break
-#        headers = {
-#            'Accept': 'application/json',
-#            'Content-Type': 'application/json',
-#            'Authorization': 'Bearer BQBFaEnaf6HDMRZq1DS1bHECNOrjoImHAiMV2y6UjA3PvVMbveaol9WucDo5-IE8BUy2r9zgxg8bv1eq70wI8nwhyKmV_xSEqY-pQLFIAS8WzCagZx-iKvByCj1A_pEQSactDwG6hNm2h0Q72HL06PwaR5EWIU4_8pmGU6xn6ZT9zFWLLqFDdo3qRJslOInZNe-Vu7J6XLCS1Hja6DJ9-eSdEMLkID5vAp0qAVODqIZN_7qKZ-KpbvZfIs6hacPlcWjct-C0ayM9wDm5rXhlGFCS44UZETlVCw',
-#        }
-#        
-#        video_capture.release()
-#        cv2.destroyAllWindows()
-#        
-#        data = '{"device_ids":["10640d809a60bd540378d37abc213d91f52357bc"]}'
-#        response = requests.put('https://api.spotify.com/v1/me/player', headers=headers, data=data)
-#        print(response.content)
-#        params = (
-#            ('device_id', '10640d809a60bd540378d37abc213d91f52357bc'),
-#        )
-#        final_emotion = mode(emotions)
-#        if final_emotion == 'happy':
-#            data = '{"context_uri":"spotify:playlist:1llkez7kiZtBeOw5UjFlJq","offset":{"position":1},"position_ms":0}'
-#        elif final_emotion == 'sad':
-#            data = '{"context_uri":"spotify:playlist:3m0JCCYnh27D4J13rWBfgs","offset":{"position":1},"position_ms":0}'
-#        elif final_emotion == 'surprise':
-#            data = '{"context_uri":"spotify:playlist:3ylCiverZxobHBTbMy1dO5","offset":{"position":1},"position_ms":0}'
-#        elif final_emotion == 'angry':
-#            data = '{"context_uri":"spotify:playlist:0KPEhXA3O9jHFtpd1Ix5OB","offset":{"position":1},"position_ms":0}'
-#        else:
-#            data = '{"context_uri":"spotify:playlist:0s609Gm5FgpZu6VfJA4I1H","offset":{"position":1},"position_ms":0}'
-#
-#        response = requests.put('https://api.spotify.com/v1/me/player/play', headers=headers, params=params, data=data)
-
-#    print(f"Spotify API for emotion {mode(emotions)}")
 
 
 if __name__ == "__main__":

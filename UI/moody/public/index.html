@@ -1,0 +1,105 @@
+<html>
+
+<head>
+  <title>Express</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<script>
+  function play(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/play');
+    request.send();
+  }
+
+  function pause(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/pause');
+    request.send();
+  }
+
+  function volumeUp(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/increase_volume');
+    request.send();
+  }
+
+  function volumeDown(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/decrease_volume');
+    request.send();
+  }
+
+  function next(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/next_track');
+    request.send();
+  }
+
+  function prev(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/prev_track');
+    request.send();
+  }
+
+  document.getElementById("song").onclick = function () {
+    var request = new XMLHttpRequest();
+    var artist = document.getElementById("artist").value;
+    var song = document.getElementById("song").value;
+    request.open('GET','http://127.0.0.1:5000/add_track?artist=' + artist + "&song=" + song)
+  }
+
+  function shuffle_on(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/shuffle_on');
+    request.send();
+  }
+
+  function shuffle_off(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/shuffle_off');
+    request.send();
+  }
+
+  function anti_break_in_demo(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/anti_break_in');
+    request.send();
+  }
+
+  function user_detection_demo(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/user_detection');
+    request.send();
+  }
+
+  function mood_detection_demo(){
+    var request = new XMLHttpRequest();
+    request.open('GET','http://127.0.0.1:5000/mood_detection');
+    request.send();
+  }
+</script>
+
+<body class="content">
+<!--<button onclick="window.location.href = 'http://127.0.0.1:5000/play';">Play</button>-->
+<button class="button" onclick="play()">Play</button><br><br>
+<button class="button" onclick="pause()">Pause</button><br><br>
+<button class="button" onclick="volumeUp()">Volume Up</button><br><br>
+<button class="button" onclick="volumeDown()">Volume Down</button><br><br>
+<button class="button" onclick="next()">Next Track</button><br><br>
+<button class="button" onclick="prev()">Prev Track</button><br><br>
+<button class="button" onclick="shuffle_on()">Shuffle On</button><br><br>
+<button class="button" onclick="shuffle_off()">Shuffle Off</button><br><br>
+<b><p>Add Track To Playlist:</p></b>
+<span>Song</span><br>
+<input type="text" id="song"></input><br><br>
+<span>Artist</span><br>
+<input type="text" id="artist"></input><br><br>
+<button class="button" onclick="addTrack()">Add Track</button><br><br>
+<button class="button" onclick="anti_break_in_demo()">Anti Break-in Demo</button><br><br>
+<button class="button" onclick="user_detection_demo()">User Detection Demo</button><br><br>
+<button class="button" onclick="mood_detection_demo()">Mood Detection Demo</button><br><br>
+
+</body>
+
+</html>
